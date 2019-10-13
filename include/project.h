@@ -7,3 +7,20 @@
 #include <time.h>
 #include <getopt.h>
 #include <sys/types.h>
+
+
+typedef struct matrix {
+    int size;
+    char **array;
+} MATRIX;
+
+//reading the file
+int read_file(MATRIX* m, char *filepath);
+
+//memory functions
+void *handle_malloc(size_t size);
+void *handle_realloc(void *ptr, size_t size);
+
+//debug
+void debug();
+void print_matrix(MATRIX *m);

@@ -3,15 +3,13 @@
 int main(int argc, char const *argv[])
 {
     int opt;
-    char *file1, *file2;
+    char *file1;
     while((opt = getopt(argc, argv, ":f:n")) != -1) {
         switch(opt) {
             case 'f':
                 file1 = optarg;
                 break;
-            case 'n':
-                //set number of processors
-            case ':': 
+            case ':':
                 //filename was not supplied
                 fprintf(stderr, "%s: option `-%c' requires an argument\n", argv[0], optopt);
                 break;
@@ -25,7 +23,7 @@ int main(int argc, char const *argv[])
         fprintf(stderr, "%s: no file provided\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+    read_file(file1);
 
-    
     return 0;
 }

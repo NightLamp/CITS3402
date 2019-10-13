@@ -8,9 +8,11 @@ BDIR=./bin
 CC=gcc 
 CFLAGS=-Wall -Werror -pedantic -I$(IDIR) -Wno-incompatible-pointer-types 
 
+ARGS = -f data/examples/4.in
+
 SRCS=  $(wildcard $(SDIR)/*.c) 
 OBJS=$(patsubst $(SDIR)/%.c,$(ODIR)/%.o,$(SRCS))
-PROJECT=project
+PROJECT=bin/project
 
 DEBUG = no
 PROFILE = no
@@ -37,7 +39,7 @@ endif
 
 all: $(PROJECT)
 
-$(PROJECT): $(OBJS) 
+$(PROJECT): $(OBJS) | $(BDIR)
 	$(CC) $(LIBS) $^ -o $@  
 
 $(ODIR)/%.o: $(SDIR)/%.c | $(ODIR)
@@ -50,7 +52,10 @@ $(BDIR) $(ODIR):
 	
 
 clean:
-	rm -f $(ODIR)/*.o $(ODIR)/*.o *~ core $(IDIR)/*~ 
+	rm -f $(ODIR)/*.o *~ core $(IDIR)/*~ 
+
+run: $(PROJECT)
+	$< $(ARGS)
 
 rebuild: clean all
 
