@@ -5,8 +5,11 @@ SDIR=./src
 BDIR=./bin
 
 
-CC=gcc 
-CFLAGS=-Wall -Werror -pedantic -I$(IDIR) -Wno-incompatible-pointer-types 
+CC=mpicc 
+RUN = mpiexec
+CFLAGS=-Wall -Werror -pedantic -I$(IDIR) -Wno-incompatible-pointer-types
+
+ARGS = -f infile
 
 ARGS = -f data/examples/4.in
 
@@ -36,6 +39,9 @@ endif
 ifeq ($(OPT), yes)
 	CFLAGS += $(OPTIMIZATION)
 endif
+
+run: $(PROJECT)
+	$< $(ARGS)
 
 all: $(PROJECT)
 
