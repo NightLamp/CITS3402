@@ -22,8 +22,13 @@ int floyd_warshall(MATRIX * m) {
 			// 		recieve bcast
 			
 			for (int i = 0; i < nodeCount; i++) {
-				if ((dist[i][j] != 0 && dist[i][k] != 0 && dist[k][j]) != 0) {
-					dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+				if (dist[i][k] != 0 && dist[k][j] != 0) {
+					if (dist[i][j] != 0) {
+						dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+					}
+					else {
+						dist[i][j] = dist[i][k] + dist[k][j];
+					}
 				}
 			}
 		}
