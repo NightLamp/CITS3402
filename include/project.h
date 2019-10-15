@@ -11,7 +11,7 @@
 
 typedef struct matrix {
     int size;
-    char **array;
+    int **array;
 } MATRIX;
 
 //reading the file
@@ -24,3 +24,7 @@ void *handle_realloc(void *ptr, size_t size);
 //debug
 void debug();
 void print_matrix(MATRIX *m);
+
+//floyd-warshall
+int min(int a, int b);
+int floyd_warshall(MATRIX * m);
