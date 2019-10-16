@@ -2,6 +2,7 @@
 
 int main(int argc, char const *argv[])
 {
+    MPI_Init(&argc, &argv);
     int opt;
     char *file1;
     while((opt = getopt(argc, argv, ":f:n")) != -1) {
@@ -32,6 +33,7 @@ int main(int argc, char const *argv[])
 		floyd_warshall(&m);
 		printf("\ndist mat:\n");
 		print_matrix(&m);
-		
+	
+    MPI_Finalize();
     return 0;
 }

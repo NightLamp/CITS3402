@@ -8,6 +8,8 @@
 #include <getopt.h>
 #include <sys/types.h>
 
+#include"mpi.h"
+
 
 typedef struct matrix {
     int size;

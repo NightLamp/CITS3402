@@ -55,7 +55,7 @@ $(BDIR) $(ODIR):
 
 
 run: $(PROJECT)
-	$(RUN) -n $(THREADS) bin/$(PROJECT) $(ARGS)
+	$(RUN) -n $(THREADS) $(PROJECT) $(ARGS)
 
 clean:
 	rm -f $(ODIR)/*.o *~ core $(IDIR)/*~ 
