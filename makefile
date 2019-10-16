@@ -9,7 +9,7 @@ CC=mpicc
 RUN = mpiexec
 CFLAGS=-Wall -Werror -pedantic -I$(IDIR) -Wno-incompatible-pointer-types
 
-ARGS = -f infile
+THREADS = 4
 
 ARGS = -f data/examples/4.in
 
@@ -40,9 +40,6 @@ ifeq ($(OPT), yes)
 	CFLAGS += $(OPTIMIZATION)
 endif
 
-run: $(PROJECT)
-	$< $(ARGS)
-
 all: $(PROJECT)
 
 $(PROJECT): $(OBJS) | $(BDIR)
@@ -55,13 +52,13 @@ $(ODIR)/%.o: $(SDIR)/%.c | $(ODIR)
 
 $(BDIR) $(ODIR):
 	mkdir $@
-	
+
+
+run: $(PROJECT)
+	$(RUN) -n $(THREADS) bin/$(PROJECT) $(ARGS)
 
 clean:
 	rm -f $(ODIR)/*.o *~ core $(IDIR)/*~ 
-
-run: $(PROJECT)
-	$< $(ARGS)
 
 rebuild: clean all
 

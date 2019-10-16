@@ -37,8 +37,6 @@ int floyd_warshall(MATRIX * m) {
 }
 
 
-
-
 int min(int a, int b) {
 	if (a < b) {
 		return a;
