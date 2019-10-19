@@ -37,6 +37,8 @@ int main(int argc, char const *argv[])
 		printf("\nnow distributed\n");
 		SUB_MATRIX sm;
 		read_file_distributed(&sm, file1);
+		printf("sub_matrix:\n");
+		print_sub_matrix(&sm);
 	
     MPI_Finalize();
     return 0;

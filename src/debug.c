@@ -16,8 +16,8 @@ void print_matrix(MATRIX *m) {
 
 
 void print_sub_matrix(SUB_MATRIX *m) {
-    int nodeCount = m->nodeCount;
-		int localCount = m->localCount;
+    int nodeCount = m->fullSize;
+		int localCount = m->localSize;
 
     for(int i = 0; i<localCount; i++){
         for(int j = 0; j<nodeCount; j++){

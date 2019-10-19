@@ -17,3 +17,10 @@ void *handle_realloc(void *ptr, size_t size) {
     }
     return res;
 }
+
+
+void copy_array(int * to, int * from, int length) {
+	for (int i=0; i<length; i++) {
+		to[i] = from[i];
+	}
+}

@@ -37,14 +37,6 @@ int read_file(MATRIX *m, char *filepath) {
     return 0;
 }
 
-//----------------------------------------------------------------------------//
-// TODO: add to project.h
-
-int get_local_node_count(int p, int pc, int nc);
-int get_file_offset(int p, int pc, int nc);
-
-// end: add to project.h
-//----------------------------------------------------------------------------//
 
 int read_file_distributed(SUB_MATRIX *m, char *filepath) {
 
@@ -68,18 +60,13 @@ int read_file_distributed(SUB_MATRIX *m, char *filepath) {
 		fprintf(stderr, "cannot have negative matrix dimensions\n");
 		exit(EXIT_FAILURE);	
 	}
-	printf("nc = %d\n", nc);
-	
 	//// calculate local node count
 	int lnc; 	// local node count
 	lnc = get_local_node_count(p, pc, nc);
 
 	//// calculate read offset 
-	int fo;   // file offset
-	fo = get_file_offset(p, pc, nc);
-
-	//// debug print
-	printf("p = %d\tlnc = %d\t fo = %d\n", p, lnc, fo);
+	int no;   // node offset
+	no = get_node_offset(p, pc, nc);
 
 	//// make datatype for reading 
 	MPI_Datatype readBuf;
@@ -88,7 +75,7 @@ int read_file_distributed(SUB_MATRIX *m, char *filepath) {
 
 	//// set file view with offset
 	int bo;    // binary offset 
-	bo = ((fo - 1) * nc + 1) * sizeof(int);
+	bo = ((no - 1) * nc + 1) * sizeof(int);
  	MPI_File_set_view(fh, bo, MPI_INT, readBuf, "native", MPI_INFO_NULL);
 
 	//// read file into buffer
@@ -96,17 +83,22 @@ int read_file_distributed(SUB_MATRIX *m, char *filepath) {
 	int * buffer = handle_malloc(rs*sizeof(int));
 	// test read
 	MPI_File_read_all(fh, buffer, lnc, readBuf, MPI_STATUS_IGNORE);
-	printf("debug: rank = %d, bo = %d\t\nbuffer:\n", p, bo);
-	print_array(buffer, rs);
-	printf("\n");
 
 	MPI_File_close(&fh);
 
 	//// convert buffer into sub_matrix
-
-	return -1;
+	m->array = handle_malloc(lnc * sizeof(int *));
+	for (int r=0; r<lnc; r++) {
+		int * row = handle_malloc(nc * sizeof(int));
+		copy_array(row, &(buffer[r*nc]), nc);
+		m->array[r] = row;
+	}
+	m->fullSize = nc;
+	m->localSize = lnc;
+	m->nodeOffset = no;
+	
+	return 0;
 }
-
 
 
 /**
@@ -128,19 +120,28 @@ int get_local_node_count(int p, int pc, int nc) {
 }
 
 
-int get_file_offset(int p, int pc, int nc) {
+/**
+ * gets the node offset of sub_mattrix
+ * args
+ *   p  = processor rank
+ *   pc = processor count
+ *   nc = node count 
+ * ret
+ *   node offset
+ **/
+int get_node_offset(int p, int pc, int nc) {
 
 	int op  = nc % pc;    // overflow processors
 	//int np  = nc - op;    // normal processors
 	int lnc = nc / pc;    // local node count (no overflow)
-	int fo;           // offset to be returned
+	int no;           // offset to be returned
 
 	if (p < op) {
-		fo = p * (lnc + 1);
+		no = p * (lnc + 1);
 	}
 	else {
-		fo = (op * (lnc+1)) + ((p - op) * lnc);
+		no = (op * (lnc+1)) + ((p - op) * lnc);
 	}
 
-	return fo + 1;
+	return no + 1;
 }
