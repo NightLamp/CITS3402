@@ -13,3 +13,24 @@ void print_matrix(MATRIX *m) {
         printf("\n");
     }
 }
+
+
+void print_sub_matrix(SUB_MATRIX *m) {
+    int nodeCount = m->nodeCount;
+		int localCount = m->localCount;
+
+    for(int i = 0; i<localCount; i++){
+        for(int j = 0; j<nodeCount; j++){
+            printf("%d ", m->array[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+
+void print_array(int * arr, int length) {
+	for (int i=0; i<length; i++) {
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}

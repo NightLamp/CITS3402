@@ -25,14 +25,18 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
 
-		MATRIX m;
-    read_file(&m, file1);
-
-		printf("\nog matrix:\n");
-		print_matrix(&m);
-		floyd_warshall(&m);
-		printf("\ndist mat:\n");
-		print_matrix(&m);
+//		MATRIX m;
+//    read_file(&m, file1);
+//
+//		printf("\nog matrix:\n");
+//		print_matrix(&m);
+//		floyd_warshall(&m);
+//		printf("\ndist mat:\n");
+//		print_matrix(&m);
+//	
+		printf("\nnow distributed\n");
+		SUB_MATRIX sm;
+		read_file_distributed(&sm, file1);
 	
     MPI_Finalize();
     return 0;
