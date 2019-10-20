@@ -59,6 +59,7 @@ run: $(PROJECT)
 
 clean:
 	rm -f $(ODIR)/*.o *~ core $(IDIR)/*~ 
+	rm -f $(PROJECT)
 
 rebuild: clean all
 
