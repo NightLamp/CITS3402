@@ -5,8 +5,13 @@ int main(int argc, char const *argv[])
     MPI_Init(&argc, &argv);
     int opt;
     char *file1;
-    while((opt = getopt(argc, argv, ":f:n")) != -1) {
+    bool distributed = false;
+		bool dispTime = false;
+
+    while((opt = getopt(argc, argv, "t:f:n")) != -1) {
         switch(opt) {
+            case 't':
+                dispTime = true;
             case 'f':
                 file1 = optarg;
                 break;
@@ -27,9 +32,14 @@ int main(int argc, char const *argv[])
 
 
 	int p;
-	MPI_Comm_rank(MPI_COMM_WORLD, &p);
-	int distributed = false;
+	int pc;
+	int nc;
+	double time;
 
+	MPI_Comm_rank(MPI_COMM_WORLD, &p);
+	MPI_Comm_size(MPI_COMM_WORLD, &pc);
+
+	// depreciated, there for reference currently
 	if (distributed == true) {
 		if (p == 0) {
 			MATRIX m;
@@ -43,24 +53,36 @@ int main(int argc, char const *argv[])
 		}
 	}
 	else {
+		//// load file into sm
 		SUB_MATRIX sm;
 		read_file_distributed(&sm, file1);
+		nc = sm.fullSize;
 
+		//// print original matrix
 		MPI_Barrier(MPI_COMM_WORLD);
 		if (p == 0) {
-			printf("sub_matrix:\n");
+			printf("original matrix:\n");
 		}
 		print_matrix_distributed(&sm);
 	
-		// calc shortest distances
-		floyd_warshall_distributed(&sm);
 
+		//// calc shortest distances
+		time = -MPI_Wtime();
+		floyd_warshall_distributed(&sm);
+		time += MPI_Wtime();
+
+
+		if (dispTime == true && p == 0) {
+			printf("proccessor count: %d\nnode count: %d\ntime: %f\n", pc, nc, time);
+		}
+
+		//// print result mat
 		MPI_Barrier(MPI_COMM_WORLD);
 		if (p == 0) {
-			printf("\nresult mat:\n");
+			printf("\ndistance matrix:\n");
 		}
 		print_matrix_distributed(&sm);
-	}
+}
 
     MPI_Finalize();
     return 0;
