@@ -93,6 +93,8 @@ int read_file_distributed(SUB_MATRIX *m, char *filepath) {
 		copy_array(row, &(buffer[r*nc]), nc);
 		m->array[r] = row;
 	}
+	free(buffer);
+
 	m->fullSize = nc;
 	m->localSize = lnc;
 	m->nodeOffset = no;

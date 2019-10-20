@@ -14,6 +14,25 @@ void print_matrix(MATRIX *m) {
     }
 }
 
+void print_matrix_distributed(SUB_MATRIX *sm) {
+
+	int nc; 
+	int p;
+	int pc;
+
+	nc = sm->fullSize;
+	MPI_Comm_rank(MPI_COMM_WORLD, &p);
+	MPI_Comm_size(MPI_COMM_WORLD, &pc);
+
+	for (int i=0; i<pc; i++) {
+		MPI_Barrier(MPI_COMM_WORLD);
+		if (p == i) {
+			for (int n=0; n<sm->localSize; n++) {
+				print_array(sm->array[n], nc);
+			}
+		}
+	}
+}
 
 void print_sub_matrix(SUB_MATRIX *m) {
     int nodeCount = m->fullSize;

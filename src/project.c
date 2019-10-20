@@ -25,21 +25,43 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
 
-//		MATRIX m;
-//    read_file(&m, file1);
-//
-//		printf("\nog matrix:\n");
-//		print_matrix(&m);
-//		floyd_warshall(&m);
-//		printf("\ndist mat:\n");
-//		print_matrix(&m);
-//	
-		printf("\nnow distributed\n");
+
+	int p;
+	MPI_Comm_rank(MPI_COMM_WORLD, &p);
+	int distributed = false;
+
+	if (distributed == true) {
+		if (p == 0) {
+			MATRIX m;
+			read_file(&m, file1);
+
+			printf("\nog matrix:\n");
+			print_matrix(&m);
+			floyd_warshall(&m);
+			printf("\ndist mat:\n");
+			print_matrix(&m);
+		}
+	}
+	else {
 		SUB_MATRIX sm;
 		read_file_distributed(&sm, file1);
-		printf("sub_matrix:\n");
-		print_sub_matrix(&sm);
+
+		MPI_Barrier(MPI_COMM_WORLD);
+		if (p == 0) {
+			printf("sub_matrix:\n");
+		}
+		print_matrix_distributed(&sm);
 	
+		// calc shortest distances
+		floyd_warshall_distributed(&sm);
+
+		MPI_Barrier(MPI_COMM_WORLD);
+		if (p == 0) {
+			printf("\nresult mat:\n");
+		}
+		print_matrix_distributed(&sm);
+	}
+
     MPI_Finalize();
     return 0;
 }
