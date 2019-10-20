@@ -47,7 +47,11 @@ int main(int argc, char const *argv[])
 
 			printf("\nog matrix:\n");
 			print_matrix(&m);
+
+		  time = -MPI_Wtime();
 			floyd_warshall(&m);
+		  time += MPI_Wtime();
+
 			printf("\ndist mat:\n");
 			print_matrix(&m);
 		}
@@ -65,13 +69,10 @@ int main(int argc, char const *argv[])
 		}
 		print_matrix_distributed(&sm);
 	
-
 		//// calc shortest distances
 		time = -MPI_Wtime();
 		floyd_warshall_distributed(&sm);
 		time += MPI_Wtime();
-
-
 
 		//// print result mat
 		MPI_Barrier(MPI_COMM_WORLD);
@@ -79,12 +80,14 @@ int main(int argc, char const *argv[])
 			printf("\ndistance matrix:\n");
 		}
 		print_matrix_distributed(&sm);
-
-		if (dispTime == true) {
-			printf("proccessor count: %d\nnode count: %d\ntime: %f\n", pc, nc, time);
-		}
+	}
+	
+	//// print timer if wanted
+	MPI_Barrier(MPI_COMM_WORLD);
+	if (dispTime == true && p == 0) {
+		printf("proccessor count: %d\nnode count: %d\ntime: %f\n", pc, nc, time);
 	}
 
-    MPI_Finalize();
-    return 0;
+	MPI_Finalize();
+	return 0;
 }

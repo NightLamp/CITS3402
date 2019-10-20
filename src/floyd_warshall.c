@@ -1,7 +1,9 @@
 #include "project.h"
 
 
-
+/**
+ * sequential implementation of flyod-warshall all pairs shortest path
+ **/
 int floyd_warshall(MATRIX * m) {
 
 	int nodeCount = m->size;
@@ -27,25 +29,13 @@ int floyd_warshall(MATRIX * m) {
 }
 
 
-int node_in_proc(int n, int nc, int pc) {
-	
-	int p;                      // processor n is stored in 
-	int opc = nc % pc;          // overflow processor count
-	int lnc = nc / pc;          // local node count (no overflow)
-	int onc = opc * (lnc + 1);  // overflow node count
-
-	if (n < onc) {
-		// still an overflow proc
-		p = n / (lnc + 1);
-	}
-	else {
-		// past overflow procs, 
-		p = opc + ((n - onc) / lnc);
-	}
-
-	return p;
-}
-
+/**
+ * distributed implementation of floyd-warshall all pairs shortest path.
+ * args
+ *   sm = sub matrix stored locally
+ * ret 
+ *   int: always 0
+ **/
 int floyd_warshall_distributed(SUB_MATRIX * sm) {
 
 
@@ -66,7 +56,7 @@ int floyd_warshall_distributed(SUB_MATRIX * sm) {
 		int kl;    // k local index
 		int kp;    // procssor holding k
 		kp = node_in_proc(k, nc, pc);
-		kl = k - sm->nodeOffset + 1;
+		kl = k - sm->nodeOffset;
 
 		//// set k_dist if node k is local
 		if (kp == p) {
@@ -106,14 +96,4 @@ int floyd_warshall_distributed(SUB_MATRIX * sm) {
 		}
 	}
 	return 0;
-}
-
-
-int min(int a, int b) {
-	if (a < b) {
-		return a;
-	}
-	else {
-		return b;
-	}
 }

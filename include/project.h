@@ -33,7 +33,11 @@ int get_node_offset(int p, int pc, int nc);
 //memory functions
 void *handle_malloc(size_t size);
 void *handle_realloc(void *ptr, size_t size);
+
+//utility functions
 void copy_array(int * to, int * from, int length);
+int min(int a, int b);
+int node_in_proc(int n, int nc, int pc);
 
 //debug
 void debug();
@@ -43,7 +47,6 @@ void print_matrix_distributed(SUB_MATRIX * sm);
 void print_array(int *arr, int length);
 
 //floyd-warshall
-int min(int a, int b);
 int floyd_warshall(MATRIX * m);
 int floyd_warshall_distributed(SUB_MATRIX * sm);
 

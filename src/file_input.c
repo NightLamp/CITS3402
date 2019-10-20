@@ -1,5 +1,15 @@
 #include "project.h"
 
+
+
+/**
+ * reads file into MATRIX struct for later use.
+ * args
+ *   m        = matrix struct to read file into
+ *   filepath = path to input file
+ * ret
+ *   int: always 0
+ **/
 int read_file(MATRIX *m, char *filepath) {
     FILE *fp;
     int size = 0;
@@ -37,13 +47,21 @@ int read_file(MATRIX *m, char *filepath) {
     return 0;
 }
 
-
-int read_file_distributed(SUB_MATRIX *m, char *filepath) {
+/**
+ * reads file into SUB_MATRIX structs in individual processors.
+ * args
+ *   m        = sub matrix pointer 
+ *   filepath = path to input file
+ * ret
+ *   int: always 0
+ **/
+int read_file_distributed(SUB_MATRIX *sm, char *filepath) {
 
 	//// open file for reading distribution
 	MPI_File fh;
 	MPI_File_open(MPI_COMM_WORLD, filepath, MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
 	
+	//TODO: check for file error
 
 	//// get proc details
 	int p;		// processor rank
@@ -74,8 +92,8 @@ int read_file_distributed(SUB_MATRIX *m, char *filepath) {
 	MPI_Type_commit(&readBuf);
 
 	//// set file view with offset
-	int bo;    // binary offset 
-	bo = ((no - 1) * nc + 1) * sizeof(int);
+	int bo;    // byte offset 
+	bo = (no * nc + 1) * sizeof(int);
  	MPI_File_set_view(fh, bo, MPI_INT, readBuf, "native", MPI_INFO_NULL);
 
 	//// read file into buffer
@@ -87,17 +105,17 @@ int read_file_distributed(SUB_MATRIX *m, char *filepath) {
 	MPI_File_close(&fh);
 
 	//// convert buffer into sub_matrix
-	m->array = handle_malloc(lnc * sizeof(int *));
+	sm->array = handle_malloc(lnc * sizeof(int *));
 	for (int r=0; r<lnc; r++) {
 		int * row = handle_malloc(nc * sizeof(int));
 		copy_array(row, &(buffer[r*nc]), nc);
-		m->array[r] = row;
+		sm->array[r] = row;
 	}
 	free(buffer);
 
-	m->fullSize = nc;
-	m->localSize = lnc;
-	m->nodeOffset = no;
+	sm->fullSize = nc;
+	sm->localSize = lnc;
+	sm->nodeOffset = no;
 	
 	return 0;
 }
@@ -123,7 +141,7 @@ int get_local_node_count(int p, int pc, int nc) {
 
 
 /**
- * gets the node offset of sub_mattrix
+ * returns how many nodes are before the current proc, ie. the node offset
  * args
  *   p  = processor rank
  *   pc = processor count
@@ -145,5 +163,5 @@ int get_node_offset(int p, int pc, int nc) {
 		no = (op * (lnc+1)) + ((p - op) * lnc);
 	}
 
-	return no + 1;
+	return no;
 }
