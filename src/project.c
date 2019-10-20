@@ -8,7 +8,7 @@ int main(int argc, char const *argv[])
     bool distributed = false;
 		bool dispTime = false;
 
-    while((opt = getopt(argc, argv, "t:f:n")) != -1) {
+    while((opt = getopt(argc, argv, ":f:nt")) != -1) {
         switch(opt) {
             case 't':
                 dispTime = true;
@@ -72,9 +72,6 @@ int main(int argc, char const *argv[])
 		time += MPI_Wtime();
 
 
-		if (dispTime == true && p == 0) {
-			printf("proccessor count: %d\nnode count: %d\ntime: %f\n", pc, nc, time);
-		}
 
 		//// print result mat
 		MPI_Barrier(MPI_COMM_WORLD);
@@ -82,7 +79,11 @@ int main(int argc, char const *argv[])
 			printf("\ndistance matrix:\n");
 		}
 		print_matrix_distributed(&sm);
-}
+
+		if (dispTime == true) {
+			printf("proccessor count: %d\nnode count: %d\ntime: %f\n", pc, nc, time);
+		}
+	}
 
     MPI_Finalize();
     return 0;
