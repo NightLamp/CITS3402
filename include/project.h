@@ -33,6 +33,7 @@ int get_node_offset(int p, int pc, int nc);
 //memory functions
 void *handle_malloc(size_t size);
 void *handle_realloc(void *ptr, size_t size);
+void free_sub_matrix(SUB_MATRIX *sm);
 
 //utility functions
 void copy_array(int * to, int * from, int length);
