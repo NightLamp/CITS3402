@@ -24,11 +24,14 @@ typedef struct _sub_matrix {
 	int **array;
 } SUB_MATRIX;
 
-//reading the file
-int read_file(MATRIX *m, char *filepath);
+//file io
 int read_file_distributed(SUB_MATRIX *m, char *filepath);
+int write_matrix_to_file(SUB_MATRIX *sm, char *filepath);
 int get_local_node_count(int p, int pc, int nc);
 int get_node_offset(int p, int pc, int nc);
+
+//sequential file io
+int read_file(MATRIX *m, char *filepath);
 
 //memory functions
 void *handle_malloc(size_t size);

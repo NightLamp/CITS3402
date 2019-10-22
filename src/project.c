@@ -1,31 +1,46 @@
+//TODO:
+// make error printing only by head node
+
+
+
 #include"project.h"
 
 int main(int argc, char const *argv[])
 {
     MPI_Init(&argc, &argv);
     int opt;
-    char *file1;
+    char *file_in;
+    char *file_out;
+    bool write_to_file = false;
     bool distributed = false;
 		bool dispTime = false;
+    
 
-    while((opt = getopt(argc, argv, ":f:nt")) != -1) {
+    while((opt = getopt(argc, argv, ":o:ftd")) != -1) {
         switch(opt) {
+            case 'd':
+                distributed = true;
             case 't':
                 dispTime = true;
             case 'f':
-                file1 = optarg;
+                file_in = optarg;
+            case 'o':
+                write_to_file = true;
+                file_out = optarg;
                 break;
             case ':':
                 //filename was not supplied
                 fprintf(stderr, "%s: option `-%c' requires an argument\n", argv[0], optopt);
+                exit(EXIT_FAILURE);
                 break;
             default: 
                 fprintf(stderr, "%s: option `-%c' is invalid: ignored\n", argv[0], optopt);
+                exit(EXIT_FAILURE);
                 break;
         }
     }
 
-    if(file1 == NULL){
+    if(file_in == NULL){
         fprintf(stderr, "%s: no file provided\n", argv[0]);
         exit(EXIT_FAILURE);
     }
@@ -40,10 +55,10 @@ int main(int argc, char const *argv[])
 	MPI_Comm_size(MPI_COMM_WORLD, &pc);
 
 	// depreciated, there for reference currently
-	if (distributed == true) {
+	if (distributed != true) {
 		if (p == 0) {
 			MATRIX m;
-			read_file(&m, file1);
+			read_file(&m, file_in);
 
 			printf("\nog matrix:\n");
 			print_matrix(&m);
@@ -54,12 +69,14 @@ int main(int argc, char const *argv[])
 
 			printf("\ndist mat:\n");
 			print_matrix(&m);
+
+			nc = m.size;
 		}
 	}
 	else {
 		//// load file into sm
 		SUB_MATRIX sm;
-		read_file_distributed(&sm, file1);
+		read_file_distributed(&sm, file_in);
 		nc = sm.fullSize;
 
 		//// print original matrix
@@ -80,12 +97,21 @@ int main(int argc, char const *argv[])
 			printf("\ndistance matrix:\n");
 		}
 		print_matrix_distributed(&sm);
+
+		//// write matrix to file
+		if (write_to_file == true) {
+			MPI_Barrier(MPI_COMM_WORLD);
+			write_matrix_to_file(&sm, file_out);
+		}	
+
+		free_sub_matrix(&sm);
 	}
 	
 	//// print timer if wanted
 	MPI_Barrier(MPI_COMM_WORLD);
 	if (dispTime == true && p == 0) {
 		printf("proccessor count: %d\nnode count: %d\ntime: %f\n", pc, nc, time);
+
 	}
 
 	MPI_Finalize();

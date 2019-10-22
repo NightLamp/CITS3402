@@ -24,6 +24,15 @@ void *handle_realloc(void *ptr, size_t size) {
 }
 
 
+void free_sub_matrix(SUB_MATRIX *sm) {
+
+	for (int n=0; n<sm->localSize; n++) {
+		free(sm->array[n]);
+	}
+	free(sm->array);
+}
+
+
 //----------------------------------------------------------------------------//
 // utility funcs
 
