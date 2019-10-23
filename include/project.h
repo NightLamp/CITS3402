@@ -1,3 +1,15 @@
+/**
+ * CITS3402 Assigmment 2: All Pairs Shortest Path 
+ * Floyd-Warshall Distributed Implementation
+ *
+ * File: project.h
+ *
+ * By:
+ *   Ben Longbottom  | 22234771
+ *   David Adams     | 22497769
+ **/
+
+
 #include<stdio.h>
 #include<stdlib.h>
 #include <stdlib.h>
@@ -43,8 +55,7 @@ void copy_array(int * to, int * from, int length);
 int min(int a, int b);
 int node_in_proc(int n, int nc, int pc);
 
-//debug
-void debug();
+//display
 void print_matrix(MATRIX *m);
 void print_matrix_distributed(SUB_MATRIX * sm);
 //void print_sub_matrix(SUB_MATRIX *m);
