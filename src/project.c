@@ -104,12 +104,12 @@ int main(int argc, char const *argv[]) {
 			case ':':
 				//filename was not supplied
 				if (p == 0) fprintf(stderr, "test: %s: option `-%c' requires an argument\n", argv[0], optopt);
-				exit(EXIT_FAILURE);
+				MPI_Abort(MPI_COMM_WORLD, 0);
 				break;
 			default: 
 				// invalid option given
 				if (p == 0) fprintf(stderr, "%s: option `-%c' is invalid\n", argv[0], optopt);
-				exit(EXIT_FAILURE);
+				MPI_Abort(MPI_COMM_WORLD, 0);
 				break;
 		}
 	}
@@ -118,12 +118,12 @@ int main(int argc, char const *argv[]) {
 	// no input file given
 	if (file_in == NULL) {
 		fprintf(stderr, "%s: no input file provided\n", argv[0]);
-		exit(EXIT_FAILURE);
+		MPI_Abort(MPI_COMM_WORLD, 0);
 	}
 	// no output file name given
 	if (write_to_file == true && file_out == NULL) {
 		fprintf(stderr, "%s: no output file provided\n", argv[0]);
-		exit(EXIT_FAILURE);
+		MPI_Abort(MPI_COMM_WORLD, 0);
 	}
 
 

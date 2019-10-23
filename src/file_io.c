@@ -45,7 +45,7 @@ int read_file_distributed(SUB_MATRIX *sm, char *filepath) {
 	// fail if negative matrix size read
 	if (nc < 0) {
 		if (p == 0) fprintf(stderr, "cannot have negative matrix dimensions\n");
-		exit(EXIT_FAILURE);	
+		MPI_Abort(MPI_COMM_WORLD, 0);
 	}
 		/**
 		 * MPI_File_read - Explanation
