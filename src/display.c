@@ -75,7 +75,6 @@ void print_matrix_distributed(SUB_MATRIX *sm) {
 		int vp;  // vertex's processor	
 		vp = vertex_in_proc(v, vc, pc);
 
-		MPI_Barrier(MPI_COMM_WORLD);
 		// print local vertices in head proc
 		if (vp == 0 && p == 0) {
 			print_array(sm->array[v], vc);
@@ -86,12 +85,22 @@ void print_matrix_distributed(SUB_MATRIX *sm) {
 			int lvi;   // local vertex index
 			lvi = v - sm->vertexOffset;
 			MPI_Send(sm->array[lvi], 1, mpi_row, 0, tag, MPI_COMM_WORLD);
+				/**
+ 				 * MPI_Send - Explanation
+ 				 * all non-head processors send the vth vertex to the head processor to
+ 				 * print. Point to Point communication is used as only the head 
+ 				 * node needs to recieve the vth vertex.
+ 				 **/
 		}
 		// recv vertex from other nodes and print it
 		else if (p == 0) {
 			// recv mpi_row 
 			int * buffer = handle_malloc(vc * sizeof(int));
 			MPI_Recv(buffer, 1, mpi_row, vp, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				/**
+ 				 * MPI_Recv - Explanation
+ 				 * the head processor individually recieves each vertex row one at a time 
+ 				 **/
 			// print row
 			print_array(buffer, vc);
 			free(buffer);

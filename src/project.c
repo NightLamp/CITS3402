@@ -179,7 +179,6 @@ int main(int argc, char const *argv[]) {
 
 		//// only print input matrix if verbose flag is set
 		if (verbose) {
-			MPI_Barrier(MPI_COMM_WORLD);    
 			if (p == 0) {
 				printf("original matrix:\n");
 			}
@@ -195,7 +194,6 @@ int main(int argc, char const *argv[]) {
 		// flag is set
 		if (!write_to_file || verbose) {
 			if (verbose) {
-				MPI_Barrier(MPI_COMM_WORLD);
 				if (p == 0) printf("\ndistance matrix:\n");
 			}
 			print_matrix_distributed(&sm);
@@ -203,7 +201,6 @@ int main(int argc, char const *argv[]) {
 
 		//// write matrix to file
 		if (write_to_file == true) {
-			MPI_Barrier(MPI_COMM_WORLD);
 			write_matrix_to_file(&sm, file_out);
 		}	
 
@@ -212,7 +209,6 @@ int main(int argc, char const *argv[]) {
 	}
 	
 	//// print timer if wanted
-	MPI_Barrier(MPI_COMM_WORLD);
 	if (dispTime == true && p == 0) {
 		printf("\nproccessor count: %d\nvertex count: %d\ntime: %f\n", pc, vc, timer);
 	}
