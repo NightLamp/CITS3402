@@ -38,27 +38,34 @@ int floyd_warshall(MATRIX * m) {
  **/
 int floyd_warshall_distributed(SUB_MATRIX * sm) {
 
-
 	int p;          // processor rank
 	int nc;         // node count
 	int pc;         // processor count
+	int * i_dist;   // distance from i to each node
 	int * k_dist;   // distance from k to each node
-	int ** dist;    // distance matrix alias
-	
 	nc = sm->fullSize;
 	MPI_Comm_rank(MPI_COMM_WORLD, &p);
 	MPI_Comm_size(MPI_COMM_WORLD, &pc);
-	dist = sm->array;
+	
+	//// make derived MPI datatype for row 
+	MPI_Datatype mpi_row;
+	MPI_Type_contiguous(nc, MPI_INT, &mpi_row);
+	MPI_Type_commit(&mpi_row);
+		/**
+     * makes a new MPI datatype 'mpi_row' that is nc contiguous ints. 
+     * This datatype is used for distributing rows from the matrices
+     * between processors.
+     **/
 
 	//// loop through k vals
 	for (int k = 0; k < nc; k++) {
 	
 		int kl;    // k local index
-		int kp;    // procssor holding k
+		int kp;    // (row) k's processor
 		kp = node_in_proc(k, nc, pc);
 		kl = k - sm->nodeOffset;
 
-		//// set k_dist if node k is local
+		//// setup k_dist for broadcast (according to processor rank)
 		if (kp == p) {
 			k_dist = sm->array[kl];
 		}
@@ -67,31 +74,36 @@ int floyd_warshall_distributed(SUB_MATRIX * sm) {
 		}
 
 		//// bcast 
-		// barrier here?
-		MPI_Bcast(k_dist, nc, MPI_INT, kp, MPI_COMM_WORLD);
+		MPI_Bcast(k_dist, 1, mpi_row, kp, MPI_COMM_WORLD);
+			/**
+ 			 * MPI_Bcast - Explanation
+ 			 * broadcast kth row to all processors that do not have 
+ 			 * the kth row locally.
+ 			 **/ 
+			
 		
-		//// updates if node i to j is smaller through node k
+		//// updates dist matrix if node i to j is smaller through node k
 		for (int j = 0; j < nc; j++) {
 			
 			for (int i = 0; i < sm->localSize; i++) {
-				// i_dist = sm->array[i];
+				i_dist = sm->array[i];
 		
 				// check that path i -> j -> k exists
-				if (dist[i][k] != 0 && k_dist[j] != 0) {
+				if (i_dist[k] != 0 && k_dist[j] != 0) {
 					// check that there already is a path i -> j
-					if (dist[i][j] != 0) {
+					if (i_dist[j] != 0) {
 						// update distance to smallest
-						dist[i][j] = min(dist[i][j], dist[i][k] + k_dist[j]);
+						i_dist[j] = min(i_dist[j], i_dist[k] + k_dist[j]);
 					}
 					else {
 						// put a valid path into dist
-						dist[i][j] = dist[i][k] + k_dist[j];
+						i_dist[j] = i_dist[k] + k_dist[j];
 					}
 				}
 			}
 		}
 		if (kp != p) {
-			// free read buffer if not stored in sub_matrix
+			// free k_th row if not stored locally (ie. was recieved from bcast)
 			free(k_dist);
 		}
 	}

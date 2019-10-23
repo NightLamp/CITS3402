@@ -1,5 +1,6 @@
 #include"project.h"
 
+
 void debug() {
     printf("made it here\n");
 }
@@ -14,6 +15,7 @@ void print_matrix(MATRIX *m) {
     }
 }
 
+
 void print_matrix_distributed(SUB_MATRIX *sm) {
 
 	int nc; 
@@ -25,7 +27,7 @@ void print_matrix_distributed(SUB_MATRIX *sm) {
 	MPI_Comm_size(MPI_COMM_WORLD, &pc);
 
 	for (int i=0; i<pc; i++) {
-		MPI_Barrier(MPI_COMM_WORLD);
+		MPI_Barrier(MPI_COMM_WORLD); // attempt to keep nodes printed in order
 		if (p == i) {
 			for (int n=0; n<sm->localSize; n++) {
 				print_array(sm->array[n], nc);
@@ -34,6 +36,11 @@ void print_matrix_distributed(SUB_MATRIX *sm) {
 	}
 }
 
+
+
+/**
+ * prints sub_matrix (depreciated)
+ * */
 void print_sub_matrix(SUB_MATRIX *m) {
     int nodeCount = m->fullSize;
 		int localCount = m->localSize;

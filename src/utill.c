@@ -52,7 +52,7 @@ void copy_array(int * to, int * from, int length) {
 
 
 /**
- * function that returns the smallest of the 2 ints
+ * function that returns the smallest of 2 ints
  **/
 int min(int a, int b) {
 	if (a < b) {
