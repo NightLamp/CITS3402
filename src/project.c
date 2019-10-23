@@ -2,9 +2,11 @@
  * CITS3402 Assigmment 2: All Pairs Shortest Path 
  * Floyd-Warshall Distributed Implementation
  *
+ * file: project.c
+ *
  * By:
  *   Ben Longbottom  | 22234771
- *   David Adams     | 224.....
+ *   David Adams     | 22497769
  *
  * Options:
  *   -f <filename>
@@ -21,13 +23,35 @@
  *   -v
  *     verbose: print input and output matrix, if not given program 
  *              will only print distance matrix
+ *
+ *
+ * Notes:
+ *   File Overwriting:
+ *     supplying the same input and output file name will overwrite the file
+ *   Incorrect Printing Order:
+ *     The printed order of the matrix is not guaranteed to be correct, for
+ *     accurate output, use the -o flag to write to an output file.
+ *   Input and Output files:
+ *     Input and Output filenames must be given after corresponding flags. 
+ *   Definitions:
+ *     Node - an element of a graph
+ *     Processor - a 'node' within the cluster (sorry for confusion)
+ *
+ * Floyd-Warshall Implementation:
+ *   The distribued implementation of Floyd-Warshall relies on all processors
+ *   within a cluster locally holding the distance from some nodes to all other
+ *   nodes within a graph. Each processor takes turns in broadcasting a single
+ *   locally stored node (node k) to all other procs. All the procs then use row
+ *   k to calculate the distance from its local nodes to all other nodes in the 
+ *   graph through node k. For a graph with N nodes, this results in N 
+ *   broadcasts.
  **/
 
 
 /**TODO:
  * add David's student number
- * explain MPI calls
- * make error printing only by head node (other files)
+ * fail if incorrect input filename given
+ * change node to vertex?
  * check MPI_STATUS things
  * ensure printing doesn't get cut in half
  */
@@ -46,7 +70,7 @@ int main(int argc, char const *argv[]) {
 	// initialise MPI and alter args (strip mpi parts out)
 	MPI_Init(&argc, &argv);
 	
-	//// process options
+	//// program options
 	// init option vars
 	int opt;
 	char *file_in;

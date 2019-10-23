@@ -1,5 +1,16 @@
-#include "project.h"
+/**
+ * CITS3402 Assigmment 2: All Pairs Shortest Path 
+ * Floyd-Warshall Distributed Implementation
+ *
+ * File: file_io.c
+ *
+ * By:
+ *   Ben Longbottom  | 22234771
+ *   David Adams     | 22497769
+ **/
 
+
+#include "project.h"
 
 
 
@@ -33,7 +44,7 @@ int read_file_distributed(SUB_MATRIX *sm, char *filepath) {
 	MPI_File_read(fh, &nc, 1, MPI_INT, MPI_STATUS_IGNORE);
 	// fail if negative matrix size read
 	if (nc < 0) {
-		fprintf(stderr, "cannot have negative matrix dimensions\n");
+		if (p == 0) fprintf(stderr, "cannot have negative matrix dimensions\n");
 		exit(EXIT_FAILURE);	
 	}
 		/**

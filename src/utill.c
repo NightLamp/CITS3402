@@ -1,3 +1,15 @@
+/**
+ * CITS3402 Assigmment 2: All Pairs Shortest Path 
+ * Floyd-Warshall Distributed Implementation
+ *
+ * File: utill.c
+ *
+ * By:
+ *   Ben Longbottom  | 22234771
+ *   David Adams     | 22497769
+ **/
+
+
 #include"project.h"
 
 
