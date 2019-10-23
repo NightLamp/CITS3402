@@ -49,8 +49,7 @@
 
 
 /**TODO:
- * add David's student number
- * fail if incorrect input filename given
+ * double check David's student number
  * change node to vertex?
  * check MPI_STATUS things
  * ensure printing doesn't get cut in half
@@ -116,13 +115,29 @@ int main(int argc, char const *argv[]) {
 	
 	//// catch errors in options
 	// no input file given
-	if (file_in == NULL) {
+	if (file_in == NULL && p == 0) {
 		fprintf(stderr, "%s: no input file provided\n", argv[0]);
 		MPI_Abort(MPI_COMM_WORLD, 0);
 	}
-	// no output file name given
-	if (write_to_file == true && file_out == NULL) {
+	// file_in doesn't exist
+	else if (access(file_in, F_OK) == -1 && p == 0) {
+		fprintf(stderr, "%s: input file %s does not exist\n", argv[0], file_in);
+		MPI_Abort(MPI_COMM_WORLD, 0);
+	}
+	// read permission denied
+	else if (access(file_in, R_OK) == -1 && p == 0) {
+		fprintf(stderr, "%s: read permission denied for %s\n", argv[0], file_in);
+		MPI_Abort(MPI_COMM_WORLD, 0);
+	}
+	
+	// no output file name given (probably redundant) 
+	if (write_to_file == true && file_out == NULL && p == 0) {
 		fprintf(stderr, "%s: no output file provided\n", argv[0]);
+		MPI_Abort(MPI_COMM_WORLD, 0);
+	}
+	// write permision denied
+	else if (access(file_out, F_OK) == 0 && access(file_out, W_OK) == -1 && p == 0) {
+		fprintf(stderr, "%s: write permission denied for %s\n", argv[0], file_in);
 		MPI_Abort(MPI_COMM_WORLD, 0);
 	}
 
