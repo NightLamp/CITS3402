@@ -28,9 +28,6 @@
  * Notes:
  *   File Overwriting:
  *     supplying the same input and output file name will overwrite the file
- *   Incorrect Printing Order:
- *     The printed order of the matrix is not guaranteed to be correct, for
- *     accurate output, use the -o flag to write to an output file.
  *   Input and Output files:
  *     Input and Output filenames must be given after corresponding flags. 
  *   Definitions:
@@ -51,12 +48,11 @@
 /**TODO:
  * double check David's student number
  * check MPI_STATUS things
- * ensure printing doesn't get cut in half
  */
 
 
 
-#include"project.h"
+#include "project.h"
 
 
 

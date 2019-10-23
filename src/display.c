@@ -42,6 +42,66 @@ void print_matrix(MATRIX *m) {
 }
 
 
+
+/**
+ * Print a full matrix when distributed.
+ * This function must be called by all processors holding sub matrices
+ * of the full matrix. This function cannot print out of order.
+ * args
+ *   sm = sub matrices in local processor
+ **/
+void print_matrix_distributed(SUB_MATRIX *sm) {
+
+	int vc;  // vertex count
+	int p;   // processor (rank)
+	int pc;  // processor  count
+	int tag = 1;
+
+	vc = sm->fullSize;
+	MPI_Comm_rank(MPI_COMM_WORLD, &p);
+	MPI_Comm_size(MPI_COMM_WORLD, &pc);
+
+	//// make derived MPI datatype for row 
+	MPI_Datatype mpi_row;
+	MPI_Type_contiguous(vc, MPI_INT, &mpi_row);
+	MPI_Type_commit(&mpi_row);
+		/**
+     * makes a new MPI datatype 'mpi_row' that is vc contiguous ints. 
+     * This datatype is used for reading and writing rows from the matrices
+     * in this project. 
+     **/
+
+	for (int v=0; v<vc; v++) {
+		int vp;  // vertex's processor	
+		vp = vertex_in_proc(v, vc, pc);
+
+		MPI_Barrier(MPI_COMM_WORLD);
+		// print local vertices in head proc
+		if (vp == 0 && p == 0) {
+			print_array(sm->array[v], vc);
+		}
+		// send vertex v to head proc
+		else if (p == vp && p != 0) {
+			// send mpi_row to head proc
+			int lvi;   // local vertex index
+			lvi = v - sm->vertexOffset;
+			MPI_Send(sm->array[lvi], 1, mpi_row, 0, tag, MPI_COMM_WORLD);
+		}
+		// recv vertex from other nodes and print it
+		else if (p == 0) {
+			// recv mpi_row 
+			int * buffer = handle_malloc(vc * sizeof(int));
+			MPI_Recv(buffer, 1, mpi_row, vp, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			// print row
+			print_array(buffer, vc);
+			free(buffer);
+		}
+	}
+	if (p ==0) printf("\n");
+}
+
+
+
 /**
  * Print a full matrix when distributed.
  * This function must be called by all processors holding sub matrices
@@ -49,7 +109,7 @@ void print_matrix(MATRIX *m) {
  * args
  *   sm = sub matrices in local processor
  **/
-void print_matrix_distributed(SUB_MATRIX *sm) {
+void old_print_matrix_distributed(SUB_MATRIX *sm) {
 
 	int vc;  // vertex count
 	int p;   // processor (rank)
