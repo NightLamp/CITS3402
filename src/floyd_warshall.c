@@ -18,14 +18,14 @@
  **/
 int floyd_warshall(MATRIX * m) {
 
-	int nodeCount = m->size;
+	int vertexCount = m->size;
 	int ** dist = m->array;
 	
-	for (int k = 0; k < nodeCount; k++) {		
+	for (int k = 0; k < vertexCount; k++) {		
 
-		for (int j = 0; j < nodeCount; j++) {
+		for (int j = 0; j < vertexCount; j++) {
 			
-			for (int i = 0; i < nodeCount; i++) {
+			for (int i = 0; i < vertexCount; i++) {
 				if (dist[i][k] != 0 && dist[k][j] != 0) {
 					if (dist[i][j] != 0) {
 						dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
@@ -51,38 +51,38 @@ int floyd_warshall(MATRIX * m) {
 int floyd_warshall_distributed(SUB_MATRIX * sm) {
 
 	int p;          // processor rank
-	int nc;         // node count
+	int vc;         // vertex count
 	int pc;         // processor count
-	int * i_dist;   // distance from i to each node
-	int * k_dist;   // distance from k to each node
-	nc = sm->fullSize;
+	int * i_dist;   // distance from i to each vertex
+	int * k_dist;   // distance from k to each vertex
+	vc = sm->fullSize;
 	MPI_Comm_rank(MPI_COMM_WORLD, &p);
 	MPI_Comm_size(MPI_COMM_WORLD, &pc);
 	
 	//// make derived MPI datatype for row 
 	MPI_Datatype mpi_row;
-	MPI_Type_contiguous(nc, MPI_INT, &mpi_row);
+	MPI_Type_contiguous(vc, MPI_INT, &mpi_row);
 	MPI_Type_commit(&mpi_row);
 		/**
-     * makes a new MPI datatype 'mpi_row' that is nc contiguous ints. 
+     * makes a new MPI datatype 'mpi_row' that is vc contiguous ints. 
      * This datatype is used for distributing rows from the matrices
      * between processors.
      **/
 
 	//// loop through k vals
-	for (int k = 0; k < nc; k++) {
+	for (int k = 0; k < vc; k++) {
 	
 		int kl;    // k local index
 		int kp;    // (row) k's processor
-		kp = node_in_proc(k, nc, pc);
-		kl = k - sm->nodeOffset;
+		kp = vertex_in_proc(k, vc, pc);
+		kl = k - sm->vertexOffset;
 
 		//// setup k_dist for broadcast (according to processor rank)
 		if (kp == p) {
 			k_dist = sm->array[kl];
 		}
 		else {
-			k_dist = handle_malloc(nc * sizeof(int));
+			k_dist = handle_malloc(vc * sizeof(int));
 		}
 
 		//// bcast 
@@ -94,8 +94,8 @@ int floyd_warshall_distributed(SUB_MATRIX * sm) {
  			 **/ 
 			
 		
-		//// updates dist matrix if node i to j is smaller through node k
-		for (int j = 0; j < nc; j++) {
+		//// updates dist matrix if vertex i to j is smaller through vertex k
+		for (int j = 0; j < vc; j++) {
 			
 			for (int i = 0; i < sm->localSize; i++) {
 				i_dist = sm->array[i];

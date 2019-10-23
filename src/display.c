@@ -51,19 +51,19 @@ void print_matrix(MATRIX *m) {
  **/
 void print_matrix_distributed(SUB_MATRIX *sm) {
 
-	int nc; 
-	int p;
-	int pc;
+	int vc;  // vertex count
+	int p;   // processor (rank)
+	int pc;  // processor  count
 
-	nc = sm->fullSize;
+	vc = sm->fullSize;
 	MPI_Comm_rank(MPI_COMM_WORLD, &p);
 	MPI_Comm_size(MPI_COMM_WORLD, &pc);
 
 	for (int i=0; i<pc; i++) {
-		MPI_Barrier(MPI_COMM_WORLD); // attempt to keep nodes printed in order
+		MPI_Barrier(MPI_COMM_WORLD); // attempt to keep vertex rows printed in order
 		if (p == i) {
 			for (int n=0; n<sm->localSize; n++) {
-				print_array(sm->array[n], nc);
+				print_array(sm->array[n], vc);
 			}
 		}
 	}
@@ -75,11 +75,11 @@ void print_matrix_distributed(SUB_MATRIX *sm) {
  * prints sub_matrix (depreciated)
  * */
 void print_sub_matrix(SUB_MATRIX *m) {
-    int nodeCount = m->fullSize;
+    int vertexCount = m->fullSize;
 		int localCount = m->localSize;
 
     for(int i = 0; i<localCount; i++){
-        for(int j = 0; j<nodeCount; j++){
+        for(int j = 0; j<vertexCount; j++){
             printf("%d ", m->array[i][j]);
         }
         printf("\n");

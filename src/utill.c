@@ -77,26 +77,26 @@ int min(int a, int b) {
 
 
 /**
- * get the processor rank that holds the nth node
+ * get the processor rank that holds the vth vertex
  * args
- *   n  = the node 
- *   nc = node count
+ *   v  = the vertex 
+ *   vc = vertex count
  *   pc = processor count
  **/
-int node_in_proc(int n, int nc, int pc) {
+int vertex_in_proc(int v, int vc, int pc) {
 	
 	int p;                      // processor n is stored in 
-	int opc = nc % pc;          // overflow processor count
-	int lnc = nc / pc;          // local node count (no overflow)
-	int onc = opc * (lnc + 1);  // overflow node count
+	int opc = vc % pc;          // overflow processor count
+	int lvc = vc / pc;          // local vertex count (no overflow)
+	int ovc = opc * (lvc + 1);  // overflow vertex count
 
-	if (n < onc) {
+	if (v < ovc) {
 		// still an overflow proc
-		p = n / (lnc + 1);
+		p = v / (lvc + 1);
 	}
 	else {
 		// past overflow procs, 
-		p = opc + ((n - onc) / lnc);
+		p = opc + ((v - ovc) / lvc);
 	}
 
 	return p;

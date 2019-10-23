@@ -39,53 +39,53 @@ int read_file_distributed(SUB_MATRIX *sm, char *filepath) {
 
 	
 	//// get matrix size from file
-	int nc;		// node count
+	int vc;		// vertex count
 	// only read 1st int in file
-	MPI_File_read(fh, &nc, 1, MPI_INT, MPI_STATUS_IGNORE);
+	MPI_File_read(fh, &vc, 1, MPI_INT, MPI_STATUS_IGNORE);
 	// fail if negative matrix size read
-	if (nc < 0) {
+	if (vc < 0) {
 		if (p == 0) fprintf(stderr, "cannot have negative matrix dimensions\n");
 		MPI_Abort(MPI_COMM_WORLD, 0);
 	}
 		/**
 		 * MPI_File_read - Explanation
-		 * reads 1st int from fh into nc, used independant IO because 
+		 * reads 1st int from fh into vc, used independant IO because 
 		 * only reading 1 int (size) and do not need syncronisation
 		 **/
 
-	//// calculate local node count and node offset
-	int lnc; 	// local node count
-	int no;   // node offset
-	lnc = get_local_node_count(p, pc, nc);
-	no = get_node_offset(p, pc, nc);
+	//// calculate local vertex count and vertex offset
+	int lvc; 	// local vertex count
+	int vo;   // vertex offset
+	lvc = get_local_vertex_count(p, pc, vc);
+	vo = get_vertex_offset(p, pc, vc);
 
 
 	//// make derived MPI datatype for row 
 	MPI_Datatype mpi_row;
-	MPI_Type_contiguous(nc, MPI_INT, &mpi_row);
+	MPI_Type_contiguous(vc, MPI_INT, &mpi_row);
 	MPI_Type_commit(&mpi_row);
 		/**
-     * makes a new MPI datatype 'mpi_row' that is nc contiguous ints. 
+     * makes a new MPI datatype 'mpi_row' that is vc contiguous ints. 
      * This datatype is used for reading and writing rows from the matrices
      * in this project. 
      **/
 
 	//// set file view with offset
 	int bo;    // byte offset 
-	bo = (no * nc + 1) * sizeof(int);  // +1 to skip over size
+	bo = (vo * vc + 1) * sizeof(int);  // +1 to skip over size at start of file
  	MPI_File_set_view(fh, bo, MPI_INT, mpi_row, "native", MPI_INFO_NULL);
 		/**
 		 * MPI_File_set_view - Explanation
 		 * sets all processor's view of the input file to an appropriate offset
-		 * such that each processor starts reading the appropriate nodes that
+		 * such that each processor starts reading the appropriate verices that
 		 * have been 'assigned' to the processor.
 		 **/
 
 	//// read file into buffer
-	int rs = nc * lnc;    // read size
+	int rs = vc * lvc;    // read size
 	int * buffer = handle_malloc(rs*sizeof(int));
 	// test read
-	MPI_File_read_all(fh, buffer, lnc, mpi_row, MPI_STATUS_IGNORE);
+	MPI_File_read_all(fh, buffer, lvc, mpi_row, MPI_STATUS_IGNORE);
 	// close file
 	MPI_File_close(&fh);
 		/**
@@ -96,18 +96,18 @@ int read_file_distributed(SUB_MATRIX *sm, char *filepath) {
 		 **/
 
 	//// convert buffer into sub_matrix
-	sm->array = handle_malloc(lnc * sizeof(int *));
-	for (int r=0; r<lnc; r++) {
-		int * row = handle_malloc(nc * sizeof(int));
-		copy_array(row, &(buffer[r*nc]), nc);
+	sm->array = handle_malloc(lvc * sizeof(int *));
+	for (int r=0; r<lvc; r++) { 
+		int * row = handle_malloc(vc * sizeof(int));
+		copy_array(row, &(buffer[r*vc]), vc);
 		sm->array[r] = row;
 	}
 	free(buffer);
 
 	//// set remaining sub matrix fields appropriately
-	sm->fullSize = nc;
-	sm->localSize = lnc;
-	sm->nodeOffset = no;
+	sm->fullSize = vc;
+	sm->localSize = lvc;
+	sm->vertexOffset = vo;
 	
 	return 0;
 }
@@ -116,9 +116,9 @@ int read_file_distributed(SUB_MATRIX *sm, char *filepath) {
 
 
 /**
- * write the distributd matrix to a single file on the head node
+ * write the distributd matrix to a single file on the head processor
  * args
- *   sm       = sub matrix that stores local nodes of matrix 
+ *   sm       = sub matrix that stores local vertices of matrix 
  *   filepath = file name of file to be written to
  **/
 int write_matrix_to_file(SUB_MATRIX *sm, char *filepath) {
@@ -136,55 +136,55 @@ int write_matrix_to_file(SUB_MATRIX *sm, char *filepath) {
 	MPI_Comm_size(MPI_COMM_WORLD, &pc);
 
 	//// set vars from sub matrix
-	int no;  // node offset
-	int nc;  // node count
-	int lnc; //local node count
-	no = sm->nodeOffset;
-	nc = sm->fullSize;	
-	lnc = sm->localSize;
+	int vo;  // vertex offset
+	int vc;  // vertex count
+	int lvc; //local vertex count
+	vo = sm->vertexOffset;
+	vc = sm->fullSize;	
+	lvc = sm->localSize;
 
 	//// make datatype for writing 
 	MPI_Datatype mpi_row;
-	MPI_Type_contiguous(nc, MPI_INT, &mpi_row);
+	MPI_Type_contiguous(vc, MPI_INT, &mpi_row);
 	MPI_Type_commit(&mpi_row);
 		/**
-     * makes a new MPI datatype 'mpi_row' that is nc contiguous ints. 
+     * makes a new MPI datatype 'mpi_row' that is vc contiguous ints. 
      * This datatype is used for reading and writing rows from the matrices
      * in this project. 
      **/
 
 	//// head writes matrix size to file
 	if (p == 0) {
-		MPI_File_write(fh, &nc, 1, MPI_INT, MPI_STATUS_IGNORE);
+		MPI_File_write(fh, &vc, 1, MPI_INT, MPI_STATUS_IGNORE);
 	}
 			/**
  			 * MPI_File_write - Explanation
- 			 * only the head node writes the matrix size into the file
+ 			 * only the head vertex writes the matrix size into the file
  			 **/
 			
 	//// set file view with offset
 	int bo;    // byte offset 
-	bo = (no * nc + 1) * sizeof(int);  // +1 to skip over size of byte
+	bo = (vo * vc + 1) * sizeof(int);  // +1 to skip over size of byte
  	MPI_File_set_view(fh, bo, MPI_INT, mpi_row, "native", MPI_INFO_NULL);
 		/**
 		 * MPI_File_set_view - Explanation
 		 * sets all processor's view of the input file to an appropriate offset
-		 * such that each processor starts writing its local nodes in the correct
+		 * such that each processor starts writing its local vertices in the correct
 		 * location within the file
 		 **/
 
 	//// convert sub_matrix to row major array
-	int bufSiz = lnc * nc;
+	int bufSiz = lvc * vc;
 	int * buffer = handle_malloc(bufSiz * sizeof(int));
 	// flatten the sub_matrix into a 1D row-major ordered array
-	for (int r=0; r<lnc; r++) {
-		copy_array(&buffer[r*nc], sm->array[r], nc);
+	for (int r=0; r<lvc; r++) {
+		copy_array(&buffer[r*vc], sm->array[r], vc);
 	}
 	// Above is done so that collective file IO can be used more effectively
 
 
 	//// write matrix to file
-	MPI_File_write_all(fh, buffer, lnc, mpi_row, MPI_STATUS_IGNORE);
+	MPI_File_write_all(fh, buffer, lvc, mpi_row, MPI_STATUS_IGNORE);
 		/**
 		 * MPI_File_write_all - Explanation
 		 * Each processor writes to the output file using collective file IO.
@@ -201,46 +201,46 @@ int write_matrix_to_file(SUB_MATRIX *sm, char *filepath) {
 
 
 /**
- * if there is remainder 'r', first r procs have +1 nodes
+ * if there is remainder 'r', first r procs have +1 vertices
  * args
  *   p  = processor rank
  *   pc = processor count
- *   nc = node count 
+ *   vc = vertex count 
  * ret
- *   number of nodes stored in local proc
+ *   number of vertices stored in local proc
  **/
-int get_local_node_count(int p, int pc, int nc) { 
-	if (p < (nc % pc)) {
-		return nc / pc + 1;
+int get_local_vertex_count(int p, int pc, int vc) { 
+	if (p < (vc % pc)) {
+		return vc / pc + 1;
 	}
 	else {
-		return nc / pc;
+		return vc / pc;
 	}
 }
 
 
 /**
- * returns how many nodes are before the current proc, ie. the node offset
+ * returns how many vertices are before the current proc, ie. the vertices offset
  * args
  *   p  = processor rank
  *   pc = processor count
- *   nc = node count 
+ *   vc = vertex count 
  * ret
- *   node offset
+ *   vertex offset
  **/
-int get_node_offset(int p, int pc, int nc) {
+int get_vertex_offset(int p, int pc, int vc) {
 
-	int opc  = nc % pc;    // overflow processor count
-	//int np  = nc - opc;    // normal processors
-	int lnc = nc / pc;    // local node count (no overflow)
-	int no;           // offset to be returned
+	int opc  = vc % pc;    // overflow processor count
+	//int np  = vc - opc;    // normal processors
+	int lvc = vc / pc;    // local vertex count (no overflow)
+	int vo;           // offset to be returned
 
 	if (p < opc) {
-		no = p * (lnc + 1);
+		vo = p * (lvc + 1);
 	}
 	else {
-		no = (opc * (lnc+1)) + ((p - opc) * lnc);
+		vo = (opc * (lvc+1)) + ((p - opc) * lvc);
 	}
 
-	return no;
+	return vo;
 }

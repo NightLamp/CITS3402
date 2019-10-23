@@ -34,23 +34,22 @@
  *   Input and Output files:
  *     Input and Output filenames must be given after corresponding flags. 
  *   Definitions:
- *     Node - an element of a graph
- *     Processor - a 'node' within the cluster (sorry for confusion)
+ *     vertex - an element of a graph
+ *     Processor - a 'node' within the cluster 
  *
  * Floyd-Warshall Implementation:
  *   The distribued implementation of Floyd-Warshall relies on all processors
- *   within a cluster locally holding the distance from some nodes to all other
- *   nodes within a graph. Each processor takes turns in broadcasting a single
- *   locally stored node (node k) to all other procs. All the procs then use row
- *   k to calculate the distance from its local nodes to all other nodes in the 
- *   graph through node k. For a graph with N nodes, this results in N 
+ *   within a cluster locally holding the distance from some vertices to all other
+ *   vertices within a graph. Each processor takes turns in broadcasting a single
+ *   locally stored vertex (vertex k) to all other procs. All the procs then use row
+ *   k to calculate the distance from its local vertices to all other vertices in the 
+ *   graph through vertex k. For a graph with N vertices, this results in N 
  *   broadcasts.
  **/
 
 
 /**TODO:
  * double check David's student number
- * change node to vertex?
  * check MPI_STATUS things
  * ensure printing doesn't get cut in half
  */
@@ -144,7 +143,7 @@ int main(int argc, char const *argv[]) {
 
 	//// operation vars
 	int pc;       // processor count
-	int nc;       // node count
+	int vc;       // vertex count
 	double timer;
 	// get proccessor count
 	MPI_Comm_size(MPI_COMM_WORLD, &pc);
@@ -155,7 +154,7 @@ int main(int argc, char const *argv[]) {
 		if (p == 0) {
 			MATRIX m;
 			read_file(&m, file_in);
-			nc = m.size;
+			vc = m.size;
 
 			if (verbose) {
 				printf("\nog matrix:\n");
@@ -180,7 +179,7 @@ int main(int argc, char const *argv[]) {
 		//// load file into sm
 		SUB_MATRIX sm;
 		read_file_distributed(&sm, file_in);
-		nc = sm.fullSize;
+		vc = sm.fullSize;
 
 		//// only print input matrix if verbose flag is set
 		if (verbose) {
@@ -219,7 +218,7 @@ int main(int argc, char const *argv[]) {
 	//// print timer if wanted
 	MPI_Barrier(MPI_COMM_WORLD);
 	if (dispTime == true && p == 0) {
-		printf("\nproccessor count: %d\nnode count: %d\ntime: %f\n", pc, nc, timer);
+		printf("\nproccessor count: %d\nvertex count: %d\ntime: %f\n", pc, vc, timer);
 	}
 
 	//// finalises MPI
