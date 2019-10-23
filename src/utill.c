@@ -77,7 +77,8 @@ int min(int a, int b) {
 
 
 /**
- * get the processor rank that holds the vth vertex
+ * get the processor rank that holds the vth vertex. This function
+ * uses arithmetic operations to decrease time complexity.
  * args
  *   v  = the vertex 
  *   vc = vertex count
