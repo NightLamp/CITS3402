@@ -7,11 +7,11 @@ BDIR=./bin
 
 CC=mpicc 
 RUN = mpiexec
-CFLAGS=-Wall -Werror -pedantic -I$(IDIR) -Wno-incompatible-pointer-types
+CFLAGS=-Wall -Werror -pedantic -I$(IDIR) -Wno-incompatible-pointer-types -std=c99
 
 THREADS = 4
 
-ARGS = -f data/examples/4.in
+ARGS = -tf data/examples/4096.in
 
 SRCS=  $(wildcard $(SDIR)/*.c) 
 OBJS=$(patsubst $(SDIR)/%.c,$(ODIR)/%.o,$(SRCS))
