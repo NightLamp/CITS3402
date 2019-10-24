@@ -46,3 +46,8 @@ for k in m
 		- i for loop has O(V)
 
 therefore: O(V^3 + (V x m)) = O(V(V^2 + m))
+
+
+# Tests:
+- procTest   id: 17378
+- vertexTest id: 17379
