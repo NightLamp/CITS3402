@@ -59,7 +59,7 @@
 /**
  * Main Function
  **/
-int main(int argc, char const *argv[]) {
+int main(int argc, char *argv[]) {
 	
 	// initialise MPI and alter args (strip mpi parts out)
 	MPI_Init(&argc, &argv);
