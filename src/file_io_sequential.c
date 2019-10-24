@@ -28,7 +28,7 @@ int read_file(MATRIX *m, char *filepath) {
     fp = fopen(filepath, "rb");
 
     if(fp == NULL) {
-        fprintf(strerror, "Unable to open file\n");
+        fprintf(stderr, "Unable to open file\n");
         return -1;
     }
 
