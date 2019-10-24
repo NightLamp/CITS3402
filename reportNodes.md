@@ -24,3 +24,8 @@ E = s/p = Ts / (p x Tp)
 ## Cost
 quantifies resource needed to achieve performance
 - irrelevant to project?
+
+
+# Notes:
+- doesnt check if more processors than vertices, all processors with rank higher than vertec count will do the same operation as the last valid processor
+	- could have fixed by making a new communicator or checking for it
