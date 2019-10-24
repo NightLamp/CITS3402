@@ -48,6 +48,7 @@
 /**TODO:
  * double check David's student number
  * check MPI_STATUS things
+ * make new MPI_COMM if pc > vc?
  */
 
 
@@ -135,7 +136,6 @@ int main(int argc, char const *argv[]) {
 		fprintf(stderr, "%s: write permission denied for %s\n", argv[0], file_in);
 		MPI_Abort(MPI_COMM_WORLD, 0);
 	}
-
 
 	//// operation vars
 	int pc;       // processor count
