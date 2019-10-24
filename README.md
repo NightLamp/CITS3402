@@ -15,15 +15,15 @@ To build the project, simply run:
 ``` 
 $ make
 ```
-The output will be present as ./bin/project
+The compiled binary will be present as ./bin/project.
 
-to test that the code is operational, you can run:
+To test that the code is operational, you can run:
 ```
 $ make run
 ```
 
 ### Running
-running the program requires the command mpirun (or mpiexec) used as follows:
+Running the program requires the command mpirun (or mpiexec) used as follows:
 ```
 $ mpirun ./bin/project -f <input_file>
 ```
