@@ -28,6 +28,10 @@ Running the program requires the command mpirun (or mpiexec) used as follows:
 $ mpirun ./bin/project -f <input_file>
 ```
 
+##Running Tests
+'''
+$ make runTests
+'''
 
 ## Command Line Options
 There are 5 flags that can be used with this proogram.
@@ -36,6 +40,7 @@ There are 5 flags that can be used with this proogram.
 - \-v: verbose
 - \-f: file input
 - \-o: file output
+
 
 ## Useful links:
 
