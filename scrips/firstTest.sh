@@ -4,4 +4,4 @@
 #PBS -m abe
 #PBS -l nodes=8:ppn=4
 source /etc/bash.bashrc
-mpiexec -n 4 bin/project -tf data/examples/16.in
+make run | ..
