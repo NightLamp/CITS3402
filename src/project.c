@@ -46,7 +46,6 @@
 
 
 /**TODO:
- * double check David's student number
  * check MPI_STATUS things
  * make new MPI_COMM if pc > vc?
  */
