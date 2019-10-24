@@ -7,7 +7,7 @@ BDIR=./bin
 
 CC=mpicc 
 RUN = mpiexec
-CFLAGS=-Wall -Werror -pedantic -I$(IDIR) -Wno-incompatible-pointer-types -std=c99
+CFLAGS=-Wall -pedantic -I$(IDIR) -std=c99
 
 THREADS = 4
 
