@@ -2,7 +2,7 @@
 
 ## About this project
 This project implements floyd-warshall in a distributed manner using MPI 
-on Linux. It has been tested using Ubuntu 18.04.3 LTS and Open MPI 2.1.1.
+on Linux. It has been tested using Ubuntu 18.04.3 LTS, Manjaro 5.2.12, and Open MPI 2.1.1.
 
 ## How To Use
 The following steps will get you running this project.
@@ -27,12 +27,6 @@ Running the program requires the command mpirun (or mpiexec) used as follows:
 ```
 $ mpirun ./bin/project -f <input_file>
 ```
-
-##Running Tests
-'''
-$ make runTests
-'''
-
 ## Command Line Options
 There are 5 flags that can be used with this proogram.
 - \-s: sequential
@@ -40,12 +34,3 @@ There are 5 flags that can be used with this proogram.
 - \-v: verbose
 - \-f: file input
 - \-o: file output
-
-
-## Useful links:
-
-https://parallelcomp.github.io/Floyd.pdf
-
-https://github.com/nuno-azevedo/floyd-warshall-mpi
-
-https://tsakiris.wordpress.com/2013/07/25/parallelization-of-floyd-warshall-with-mpi-c/
