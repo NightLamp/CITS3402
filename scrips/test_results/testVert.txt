@@ -1,0 +1,19 @@
+proccessor count: 4
+vertex count: 256
+time: 0.070743
+
+proccessor count: 4
+vertex count: 512
+time: 0.555897
+
+proccessor count: 4
+vertex count: 1024
+time: 4.809138
+
+proccessor count: 4
+vertex count: 2048
+time: 41.424144
+
+proccessor count: 4
+vertex count: 4096
+time: 363.902521
